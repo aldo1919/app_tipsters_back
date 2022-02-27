@@ -14,9 +14,9 @@ app.use( express.json() );
 
 
 // Node Server
-const server = require('http').createServer(app);
-module.exports.io = require('socket.io')(server);
-require('./sockets/socket');
+// const server = require('http').createServer(app);
+// module.exports.io = require('socket.io')(server);
+// require('./sockets/socket');
 
 
 
