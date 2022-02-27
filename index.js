@@ -32,7 +32,7 @@ app.use( '/api/login', require('./routes/auth') );
 
 
 const port = process.env.PORT || 3000;
-server.listen( port , ( err ) => {
+app.listen( port , ( err ) => {
 
     if ( err ) throw new Error(err);
 
