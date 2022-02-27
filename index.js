@@ -31,12 +31,12 @@ app.use( express.static( publicPath ) );
 app.use( '/api/login', require('./routes/auth') );
 
 
-
-server.listen( process.env.PORT, ( err ) => {
+const port = process.env.PORT || 300;
+server.listen( port , ( err ) => {
 
     if ( err ) throw new Error(err);
 
-    console.log('Servidor corriendo en puerto', process.env.PORT );
+    console.log('Servidor corriendo en puerto', port );
 
 });
 
