@@ -31,9 +31,8 @@ app.use( express.static( publicPath ) );
 app.use( '/api/login', require('./routes/auth') );
 
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 app.listen( port , ( err ) => {
     if ( err ) throw new Error(err);
     console.log('Servidor corriendo en puerto', port );
-    
 });
