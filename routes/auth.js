@@ -28,4 +28,9 @@ router.post('/', [
 
 router.get('/renew', validarJWT, renewToken );
 
+router.get('/prueba_api', function(req, res){
+    res.send({"name":"GeeksforGeeks"});
+   next();
+});
+
 module.exports = router;
