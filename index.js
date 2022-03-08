@@ -25,12 +25,8 @@ app.use( express.json() );
 const publicPath = path.resolve( __dirname, 'public' );
 app.use( express.static( publicPath ) );
 
-
-
 // Mis Rutas
-app.use( '/api/login', require('./routes/auth') );
-
-
+app.use( '/api', require('./routes/index.js') );
 const port = process.env.PORT || 3000;
 app.listen( port , ( err ) => {
     if ( err ) throw new Error(err);
