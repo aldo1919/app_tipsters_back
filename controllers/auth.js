@@ -5,7 +5,7 @@ const Usuario = require('../models/usuario');
 const Taxonomy = require('../models/taxonomy');
 
 const {getDeports} = require('../controllers/deports')
-const {generarJWT} = require('../helpers/jwt');
+const {generateJWT} = require('../helpers/jwt');
 
 const {parseAuthUser} = require('../helpers/parse_response')
 
@@ -35,7 +35,7 @@ const createUser = async (req, res = response) => {
         await new_user.save();
 
         // Generate JWT
-        const token = await generarJWT(new_user.id);
+        const token = await generateJWT(new_user.id);
 
         const dbUser = await Usuario.findOne({email: new_user.email}).populate('role')
         const user = parseAuthUser(dbUser)
@@ -81,7 +81,7 @@ const login = async (req, res = response) => {
         }
 
         // Generate JWT
-        const token = await generarJWT(dbUser.id);
+        const token = await generateJWT(dbUser.id);
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
@@ -112,7 +112,7 @@ const renewToken = async (req, res = response) => {
     const dbUser = await Usuario.findById(uid).populate('role')
     const user = parseAuthUser(dbUser)
 
-    const token = await generarJWT(uid)
+    const token = await generateJWT(uid)
 
     const deports = await getDeports({params: {fields: 'name _id'}})
 

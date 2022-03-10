@@ -1,5 +1,6 @@
+const {response} = require('express');
+
 const Tipster = require("../models/tipster");
-const Deport = require("../models/deport");
 
 const create_tipster = async (req, res = response) => {
     const data = req.body
@@ -16,7 +17,8 @@ const create_tipster = async (req, res = response) => {
 
 const tipsters_by_deport = async (req, res = response) => {
     const {deport_id} = req.params
-    const tipsters = await Tipster.find({deports: deport_id}).populate('deports')
+    const tipsters = await Tipster.find({deports: deport_id})
+        .populate('deports', 'name -_id')
 
     res.json({
         ok: true,
