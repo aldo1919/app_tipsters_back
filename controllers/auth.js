@@ -7,6 +7,8 @@ const Taxonomy = require('../models/taxonomy');
 const {getDeports} = require('../controllers/deports')
 const {generarJWT} = require('../helpers/jwt');
 
+const {parseAuthUser} = require('../helpers/parse_response')
+
 
 const createUser = async (req, res = response) => {
     const data = req.body;
@@ -36,12 +38,7 @@ const createUser = async (req, res = response) => {
         const token = await generarJWT(new_user.id);
 
         const dbUser = await Usuario.findOne({email: new_user.email}).populate('role')
-        const user = {
-            username: dbUser.username,
-            email: dbUser.email,
-            role: dbUser.role.code,
-            menu: await Taxonomy.find({parents_id: dbUser.role}, 'name _id')
-        }
+        const user = parseAuthUser(dbUser)
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
@@ -88,12 +85,7 @@ const login = async (req, res = response) => {
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
-        const user = {
-            username: dbUser.username,
-            email: dbUser.email,
-            role: dbUser.role.code,
-            menu: await Taxonomy.find({parents_id: dbUser.role}, 'name _id')
-        }
+        const user = parseAuthUser(dbUser)
 
         res.json({
             ok: true,
@@ -118,12 +110,7 @@ const renewToken = async (req, res = response) => {
     const uid = req.uid;
 
     const dbUser = await Usuario.findById(uid).populate('role')
-    const user = {
-        username: dbUser.username,
-        email: dbUser.email,
-        role: dbUser.role.code,
-        menu: await Taxonomy.find({parents_id: dbUser.role}, 'name _id')
-    }
+    const user = parseAuthUser(dbUser)
 
     const token = await generarJWT(uid)
 
