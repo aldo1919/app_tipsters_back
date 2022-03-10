@@ -39,7 +39,8 @@ const createUser = async (req, res = response) => {
         const user = {
             username: dbUser.username,
             email: dbUser.email,
-            role: dbUser.role.code
+            role: dbUser.role.code,
+            menu: await Taxonomy.find({parents_id: dbUser.role}, 'name _id')
         }
 
         const deports = await getDeports({params: {fields: 'name _id'}})
@@ -90,7 +91,8 @@ const login = async (req, res = response) => {
         const user = {
             username: dbUser.username,
             email: dbUser.email,
-            role: dbUser.role.code
+            role: dbUser.role.code,
+            menu: await Taxonomy.find({parents_id: dbUser.role}, 'name _id')
         }
 
         res.json({
@@ -105,7 +107,7 @@ const login = async (req, res = response) => {
 
         return res.status(500).json({
             ok: false,
-            // error: error.message || 'No se identificó el mensaje.',
+            error: error.message || 'No se identificó el mensaje.',
             msg: 'Hable con el administrador'
         })
 
@@ -119,7 +121,8 @@ const renewToken = async (req, res = response) => {
     const user = {
         username: dbUser.username,
         email: dbUser.email,
-        role: dbUser.role.code
+        role: dbUser.role.code,
+        menu: await Taxonomy.find({parents_id: dbUser.role}, 'name _id')
     }
 
     const token = await generarJWT(uid)
