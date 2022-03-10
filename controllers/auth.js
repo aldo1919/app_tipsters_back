@@ -1,34 +1,52 @@
-const { response } = require('express');
+const {response} = require('express');
 const bcrypt = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
-const { generarJWT } = require('../helpers/jwt');
-const usuario = require('../models/usuario');
-const Deport = require('../models/deport');
+const Taxonomy = require('../models/taxonomy');
 
-const crearUsuario = async (req, res = response ) => {
-    console.log(response);
-    const { email, password } = req.body;
+const {getDeports} = require('../controllers/deports')
+const {generarJWT} = require('../helpers/jwt');
+
+
+const createUser = async (req, res = response) => {
+    const data = req.body;
 
     try {
-        const existeEmail = await Usuario.findOne({ email });
-        if( existeEmail ) {
+        const existeEmail = await Usuario.findOne({email: data.email});
+        if (existeEmail) {
             return res.status(400).json({
                 ok: false,
                 msg: 'El correo ya está registrado'
             });
         }
-        const usuario = new Usuario( req.body );
-        // Encriptar contraseña
+
+        // Add role default user
+        const role_default_user = await Taxonomy.findOne({code: 'system-role-default-user'})
+        data.role = role_default_user.id
+
+        let new_user = new Usuario(data);
+
+        // Encrypt password
         const salt = bcrypt.genSaltSync();
-        usuario.password = bcrypt.hashSync( password, salt );
-        await usuario.save();
-        const deports = await Deport.find({});
-        // Generar mi JWT
-        const token = await generarJWT( usuario.id );
+        new_user.password = bcrypt.hashSync(data.password, salt);
+
+        await new_user.save();
+
+        // Generate JWT
+        const token = await generarJWT(new_user.id);
+
+        const dbUser = await Usuario.findOne({email: new_user.email}).populate('role')
+        const user = {
+            username: dbUser.username,
+            email: dbUser.email,
+            role: dbUser.role.code
+        }
+
+        const deports = await getDeports({params: {fields: 'name _id'}})
+
         res.json({
             ok: true,
-            usuario,
+            usuario: user,
             deports,
             token
         });
@@ -41,56 +59,83 @@ const crearUsuario = async (req, res = response ) => {
     }
 }
 
-const login = async ( req, res = response ) => {
-    const { email, password } = req.body;
+const login = async (req, res = response) => {
+    const {email, password} = req.body;
+
     try {
-        const usuarioDB = await Usuario.findOne({ email });
-        const deports = await Deport.find({});
-        if ( !usuarioDB ) {
+
+        const dbUser = await Usuario.findOne({email}).populate('role');
+
+        if (!dbUser) {
             return res.status(404).json({
                 ok: false,
                 msg: 'Email no encontrado'
             });
         }
-        // Validar el password
-        const validPassword = bcrypt.compareSync( password, usuarioDB.password );
-        if ( !validPassword ) {
+
+        // Validate password
+        const validPassword = bcrypt.compareSync(password, dbUser.password);
+        if (!validPassword) {
             return res.status(400).json({
                 ok: false,
                 msg: 'La contraseña no es valida'
             });
         }
-        // Generar el JWT
-        const token = await generarJWT( usuarioDB.id );
+
+        // Generate JWT
+        const token = await generarJWT(dbUser.id);
+
+        const deports = await getDeports({params: {fields: 'name _id'}})
+
+        const user = {
+            username: dbUser.username,
+            email: dbUser.email,
+            role: dbUser.role.code
+        }
+
         res.json({
             ok: true,
-            usuario: usuarioDB,
-            deports:deports,
+            // usuario: dbUser,
+            usuario: user,
+            deports: deports,
             token
         });
+
     } catch (error) {
+
         return res.status(500).json({
             ok: false,
+            // error: error.message || 'No se identificó el mensaje.',
             msg: 'Hable con el administrador'
         })
+
     }
 }
-const renewToken = async( req, res = response) => {
+
+const renewToken = async (req, res = response) => {
     const uid = req.uid;
-    // generar un nuevo JWT, generarJWT... uid...
-    const token = await generarJWT( uid );
-    // Obtener el usuario por el UID, Usuario.findById... 
-    const usuario = await Usuario.findById( uid );
-    const deports = await Deport.find({});
+
+    const dbUser = await Usuario.findById(uid).populate('role')
+    const user = {
+        username: dbUser.username,
+        email: dbUser.email,
+        role: dbUser.role.code
+    }
+
+    const token = await generarJWT(uid)
+
+    const deports = await getDeports({params: {fields: 'name _id'}})
+
     res.json({
         ok: true,
-        usuario,
-        deports:deports,
+        usuario: user,
+        deports,
         token
     });
 }
+
 module.exports = {
-    crearUsuario,
+    createUser,
     login,
     renewToken
 }

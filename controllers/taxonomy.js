@@ -1,4 +1,5 @@
 const Taxonomy = require("../models/taxonomy");
+const {response} = require("express");
 
 
 const getTaxonomy = async (req, res = response) => {
@@ -31,8 +32,7 @@ const createTaxonomy = async (req, res = response) => {
     });
 }
 
-
 module.exports = {
     getTaxonomy,
-    createTaxonomy
+    createTaxonomy,
 }

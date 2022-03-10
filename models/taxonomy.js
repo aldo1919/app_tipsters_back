@@ -28,6 +28,10 @@ const TaxonomySchema = Schema({
         type: String,
         required: true
     },
+    icon: {
+        type: String,
+        required: false
+    },
     slug: {
         type: String,
         required: true
@@ -38,12 +42,11 @@ const TaxonomySchema = Schema({
     },
     description: {
         type: String,
-        // required: true
     },
-    parent_id: {
+    parents_id: [{
         type: Schema.Types.ObjectId,
-        ref: "Parent"
-    },
+        ref: "Taxonomy"
+    }],
 });
 
 TaxonomySchema.method('toJSON', function () {

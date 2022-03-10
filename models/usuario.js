@@ -19,6 +19,10 @@ const UsuarioSchema = Schema({
         type: Boolean,
         default: false
     },
+    role: {
+        type: Schema.Types.ObjectId,
+        ref: "Taxonomy"
+    },
 
 });
 
