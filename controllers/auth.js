@@ -85,7 +85,7 @@ const login = async (req, res = response) => {
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
-        const user = await await parseAuthUser(dbUser)
+        const user = await parseAuthUser(dbUser)
 
         res.json({
             ok: true,
