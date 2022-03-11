@@ -38,7 +38,7 @@ const createUser = async (req, res = response) => {
         const token = await generateJWT(new_user.id);
 
         const dbUser = await Usuario.findOne({email: new_user.email}).populate('role')
-        const user = parseAuthUser(dbUser)
+        const user = await parseAuthUser(dbUser)
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
@@ -85,7 +85,7 @@ const login = async (req, res = response) => {
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
-        const user = await parseAuthUser(dbUser)
+        const user = await await parseAuthUser(dbUser)
 
         res.json({
             ok: true,
@@ -110,7 +110,7 @@ const renewToken = async (req, res = response) => {
     const uid = req.uid;
 
     const dbUser = await Usuario.findById(uid).populate('role')
-    const user = parseAuthUser(dbUser)
+    const user = await parseAuthUser(dbUser)
 
     const token = await generateJWT(uid)
 
