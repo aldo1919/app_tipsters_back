@@ -18,7 +18,7 @@ const createUser = async (req, res = response) => {
         if (existeEmail) {
             return res.status(400).json({
                 ok: false,
-                msg: 'El correo ya está registrado'
+                msg: 'El correo ya está registrado.'
             });
         }
 
@@ -85,7 +85,7 @@ const login = async (req, res = response) => {
 
         const deports = await getDeports({params: {fields: 'name _id'}})
 
-        const user = parseAuthUser(dbUser)
+        const user = await parseAuthUser(dbUser)
 
         res.json({
             ok: true,
