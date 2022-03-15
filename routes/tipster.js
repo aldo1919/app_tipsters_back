@@ -1,10 +1,12 @@
 const {Router} = require('express');
 const router = Router();
-const {create_tipster, tipsters_by_deport} = require('../controllers/tipster');
-const {validarJWT} = require('../middlewares/validar-jwt');
+const {check} = require("express-validator");
 
-router.post('/create', validarJWT, create_tipster);
-router.get('/deport/:deport_id', validarJWT, tipsters_by_deport);
+const {store, tipsters_by_deport} = require('../controllers/tipster');
+const {validateJWT} = require('../middlewares/validateJWT');
+
+router.post('/create', store);
+router.get('/deport', validateJWT, tipsters_by_deport);
 
 module.exports = router;
 

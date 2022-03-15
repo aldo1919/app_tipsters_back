@@ -1,35 +1,27 @@
 const Taxonomy = require("../models/taxonomy");
-const {response} = require("express");
+const {sendError, sendSuccess} = require("../helpers/parse_response");
 
 
-const getTaxonomy = async (req, res = response) => {
-    const {slug} = req.params;
+const getTaxonomy = async (req, res) => {
+    const data = req.params;
+    try {
+        const taxonomy = await Taxonomy.findOne({where: {slug: data.slug}});
 
-    const taxonomy = await Taxonomy.findOne({slug});
+        if (!taxonomy)
+            return sendError(res, 'Taxonomy not found.', 404)
 
-    if (!taxonomy) {
-        return res.status(404).json({
-            ok: false,
-            msg: 'Taxonomy not found'
-        });
+        return sendSuccess(res, {
+            taxonomy,
+        })
+    } catch (error) {
+        return sendError(res, 'Hable con el administrador.')
     }
-
-    res.json({
-        ok: true,
-        taxonomy,
-    });
 }
 
-const createTaxonomy = async (req, res = response) => {
+const createTaxonomy = async (req, res) => {
     const data = req.body
 
-    const taxonomy = new Taxonomy(data);
-    await taxonomy.save();
-
-    res.json({
-        ok: true,
-        taxonomy,
-    });
+    await Taxonomy.storeRequest(res, data)
 }
 
 module.exports = {

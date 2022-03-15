@@ -1,59 +1,74 @@
-const {Schema, model} = require('mongoose');
-const TaxonomySchema = Schema({
-    name: {
-        type: String,
-        required: true
-    },
+const {Model, DataTypes} = require('sequelize');
+const sequelize = require('../database/sequelize')
+const {response} = require("express");
+const bcrypt = require("bcryptjs");
+
+const {sendError, parseAuthUser, sendSuccess} = require("../helpers/parse_response");
+
+const {generateJWT} = require("../helpers/jwt");
+
+class Taxonomy extends Model {
+}
+
+Taxonomy.init({
     group: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     type: {
-        type: String,
-        required: true
-    },
-    position: {
-        type: Number,
-        required: true
-    },
-    code: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     name: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
     },
-    short_name: {
-        type: String,
-        required: true
-    },
-    icon: {
-        type: String,
-        required: false
+    code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
     },
     slug: {
-        type: String,
-        required: true
-    },
-    active: {
-        type: Boolean,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
     },
     description: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: true,
     },
-    parents_id: [{
-        type: Schema.Types.ObjectId,
-        ref: "Taxonomy"
-    }],
+    active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+    },
+    position: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+    },
+}, {
+    sequelize,
+    modelName: 'taxonomy',
+    tableName: 'taxonomies',
 });
 
-TaxonomySchema.method('toJSON', function () {
-    const {__v, _id, ...object} = this.toObject();
-    object.uid = _id;
+Taxonomy.storeRequest = async (res = response, data) => {
+    try {
+        const taxonomy = await Taxonomy.create(data);
 
-    return object;
-})
+        return sendSuccess(res, {
+            taxonomy,
+        })
+    } catch (error) {
+        return sendError(res, 'Hable con el administrador.')
+    }
+}
 
-module.exports = model('Taxonomy', TaxonomySchema);
+
+module.exports = Taxonomy;

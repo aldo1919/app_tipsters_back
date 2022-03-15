@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 require('dotenv').config();
 
-// DB Config
-require('./database/config').dbConnection();
+// Mongoose Connection
+// require('./database/mongoose').dbConnection();
 
 
 // App de Express
